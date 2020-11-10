@@ -1,0 +1,36 @@
+library(igraph)
+data <- read.csv('all_data_df.csv',fileEncoding = "UTF-8")
+#data <- read.csv('top20_df.csv',fileEncoding = "UTF-8")
+#data <- read.csv('top40_df.csv',fileEncoding = "UTF-8")
+df <- data.frame(a = data[,2], B=data[,3])
+g <- graph_from_data_frame(df,directed = FALSE)
+edges <- data$edge_color
+nodes <- data$label_color
+plot.igraph(g,vertex.color = nodes, vertex.size=2,edge.color=edges, vertex.label=NA)
+eb <- edge.betweenness.community(g)
+plot(eb, g,vertex.size=5)
+members <- membership(eb) 
+members <- as.vector(members)
+eb.df <- data.frame(eb$names, members)
+write.csv(eb.df,"eb_df.csv")
+
+lp <- label.propagation.community(g)
+members <- membership(lp) 
+members <- as.vector(members)
+lp.df <- data.frame(lp$names, members)
+write.csv(lp.df,"lp_df.csv")
+plot(lp, g,vertex.size=5,vertex.label=NA)
+mm <- fastgreedy.community(g)
+members <- membership(mm) 
+members <- as.vector(members)
+mm.df <- data.frame(mm$names, members)
+write.csv(mm.df,"mm_df.csv")
+plot(mm, g,vertex.size=5,vertex.label=NA)
+
+
+
+dend <- as.dendrogram(eb)
+d <- dist(df, method = "euclidean")
+d <- na.omit(d)
+plot(dend)
+plot(eb, g,vertex.size=5,vertex.label=NA)
